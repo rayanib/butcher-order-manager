@@ -27,6 +27,11 @@ This system helps track orders, services (delivery, pickup, local), and customer
 - Material UI
 
 ---
+## 🎯 Why This Project Exists
+
+This application was built to digitize real-world order management in a butcher shop environment.
+
+It replaces manual order tracking and improves workflow efficiency inside the shop.
 
 ## 🚀 Getting Started
 
