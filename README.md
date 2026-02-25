@@ -34,4 +34,4 @@ This system helps track orders, services (delivery, pickup, local), and customer
 2. Clone the repository:
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/butcher-order-manager.git
+git clone https://github.com/rayanib/butcher-order-manager.git
