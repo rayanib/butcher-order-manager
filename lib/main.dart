@@ -919,7 +919,9 @@ class _OrdersScreenState extends State<OrdersScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final orders = widget.store.orders.where((o) => !o.done).toList();
+    final orders = widget.store.orders
+    .where((o) => !o.done && o.scheduledFor == null)
+    .toList();
     if (orders.isEmpty) {
       return const Center(child: Text("لا يوجد طلبات"));
     }
@@ -1032,7 +1034,7 @@ class OrderCardCompact extends StatelessWidget {
   Widget build(BuildContext context) {
     final total = order.totalShekel;
 
-    // يقلل تأثير تكبير الخط في أجهزة شاومي داخل الكرت
+    // Prevent Xiaomi / browser font scaling overflow
     final mq = MediaQuery.of(context);
     final safe = mq.copyWith(textScaler: const TextScaler.linear(1.0));
 
@@ -1040,12 +1042,17 @@ class OrderCardCompact extends StatelessWidget {
       data: safe,
       child: Card(
         elevation: 1.2,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(14),
+        ),
         child: Padding(
           padding: const EdgeInsets.all(10),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+
+              /// ---------- CUSTOMER + TIME ----------
               Row(
                 children: [
                   Expanded(
@@ -1066,6 +1073,7 @@ class OrderCardCompact extends StatelessWidget {
 
               const SizedBox(height: 4),
 
+              /// ---------- PHONE + SERVICE ----------
               Row(
                 children: [
                   Expanded(
@@ -1083,7 +1091,7 @@ class OrderCardCompact extends StatelessWidget {
 
               const SizedBox(height: 6),
 
-              // ✅ فقط المجموع
+              /// ---------- TOTAL ----------
               Row(
                 children: [
                   Expanded(child: MiniPill(text: "المجموع ₪ $total")),
@@ -1092,6 +1100,7 @@ class OrderCardCompact extends StatelessWidget {
 
               const SizedBox(height: 6),
 
+              /// ---------- ITEMS ----------
               Text(
                 _itemsPreview(order),
                 maxLines: 1,
@@ -1099,19 +1108,24 @@ class OrderCardCompact extends StatelessWidget {
                 style: const TextStyle(fontSize: 12),
               ),
 
-              const Spacer(),
+              const SizedBox(height: 6),
 
+              /// ---------- BUTTONS ----------
               Row(
                 children: [
                   Expanded(
                     child: SizedBox(
-                      height: 40,
+                      height: 36,
                       child: OutlinedButton.icon(
                         onPressed: onDone,
                         icon: const Icon(Icons.check, size: 16),
-                        label: const Text("تم", style: TextStyle(fontSize: 12)),
+                        label: const Text(
+                          "تم",
+                          style: TextStyle(fontSize: 12),
+                        ),
                         style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          padding:
+                              const EdgeInsets.symmetric(horizontal: 8),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -1120,17 +1134,20 @@ class OrderCardCompact extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 6),
                   Expanded(
                     child: SizedBox(
-                      height: 40,
+                      height: 36,
                       child: OutlinedButton.icon(
                         onPressed: onEdit,
                         icon: const Icon(Icons.edit, size: 16),
-                        label:
-                            const Text("تعديل", style: TextStyle(fontSize: 12)),
+                        label: const Text(
+                          "تعديل",
+                          style: TextStyle(fontSize: 12),
+                        ),
                         style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          padding:
+                              const EdgeInsets.symmetric(horizontal: 8),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -1141,8 +1158,8 @@ class OrderCardCompact extends StatelessWidget {
                   ),
                   const SizedBox(width: 6),
                   SizedBox(
-                    width: 40,
-                    height: 40,
+                    width: 36,
+                    height: 36,
                     child: IconButton(
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(),
@@ -1160,6 +1177,7 @@ class OrderCardCompact extends StatelessWidget {
     );
   }
 
+  /// ---------- ITEMS PREVIEW ----------
   String _itemsPreview(Order o) {
     if (o.items.isEmpty) return "—";
     final parts = o.items.take(2).map((e) => e.titleLine).toList();
@@ -1167,6 +1185,7 @@ class OrderCardCompact extends StatelessWidget {
     return parts.join(" • ") + more;
   }
 
+  /// ---------- SERVICE LABEL ----------
   String _serviceLabel(dynamic service) {
     final s = (service ?? "").toString().toLowerCase();
     if (s.contains("pickup") || s.contains("استلام")) return "استلام";
@@ -1176,7 +1195,6 @@ class OrderCardCompact extends StatelessWidget {
     return s.isEmpty ? "—" : service.toString();
   }
 }
- 
 class _Pill extends StatelessWidget {
   final String text;
   const _Pill({required this.text});
@@ -2717,13 +2735,26 @@ class _NewOrderScreenState extends State<NewOrderScreen> {
       noteCtrls.clear();
     });
   }
-
   Future<void> _save() async {
     final customer = nameCtrl.text.trim();
     if (customer.isEmpty || items.isEmpty) return;
 
+    // save notes
     for (int i = 0; i < items.length; i++) {
       items[i].note = noteCtrls[i]?.text.trim();
+    }
+
+    // validate time
+    if (isFuture && scheduledFor == null) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("اختر التاريخ والوقت للطلب المستقبلي")),
+      );
+      return;
+    }
+
+    if (!isFuture && pickupAt == null) {
+      pickupAt = DateTime.now().add(const Duration(minutes: 15));
     }
 
     final total = widget.store.calcOrderTotal(items);
@@ -2736,11 +2767,12 @@ class _NewOrderScreenState extends State<NewOrderScreen> {
       items: items.map((e) => e.copy()).toList(),
       service: service,
       totalShekel: total,
-      paidShekel: 0, // ✅ always 0 on "جديد"
+      paidShekel: 0,
     );
 
     await widget.store.addOrder(order);
 
+    // reset form
     nameCtrl.clear();
     phoneCtrl.clear();
     isFuture = false;
@@ -2749,15 +2781,17 @@ class _NewOrderScreenState extends State<NewOrderScreen> {
     service = ServiceType.pickup;
 
     items.clear();
-    for (final c in noteCtrls.values) c.dispose();
+    for (final c in noteCtrls.values) {
+      c.dispose();
+    }
     noteCtrls.clear();
 
-    if (mounted) setState(() {});
     if (!mounted) return;
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text("تم حفظ الطلب")));
+    setState(() {});
+    ScaffoldMessenger.of(context)
+        .showSnackBar(const SnackBar(content: Text("تم حفظ الطلب")));
   }
+  
 
   @override
   Widget build(BuildContext context) {
