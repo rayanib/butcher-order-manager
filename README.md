@@ -1,5 +1,17 @@
 # 🥩 Butcher Order Manager
 
+
+⚠️ This repository contains an earlier Flutter prototype.
+
+The main project is the full-stack version:
+https://github.com/rayanib/butcher-order-system-fullstack
+
+
+
+
+
+
+
 A professional Flutter application designed to manage customer orders in a butcher shop.
 
 This system helps track orders, services (delivery, pickup, local), and customer information in an organized and efficient way.
