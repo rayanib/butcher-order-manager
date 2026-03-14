@@ -1,34 +1,40 @@
-# 🥩 Butcher Order Manager
+# 🥩 Butcher Order Manager (Flutter Prototype)
 
+⚠️ **Note**
 
-⚠️ This repository contains an earlier Flutter prototype.
+This repository contains an **earlier Flutter prototype** of the butcher order management system.
 
-The main project is the full-stack version:
-https://github.com/rayanib/butcher-order-system-fullstack
+The **main and current project** is the full-stack version built with React, Node.js, and Express:
 
-
-
-
-
-
-
-A professional Flutter application designed to manage customer orders in a butcher shop.
-
-This system helps track orders, services (delivery, pickup, local), and customer information in an organized and efficient way.
+👉 https://github.com/rayanib/butcher-order-system-fullstack
 
 ---
 
-## 📱 Features
+## 📱 Overview
+
+A Flutter application designed to manage customer orders in a butcher shop.
+
+The system allows the shop to create orders, track services (delivery, pickup, local), and manage customer information in a structured and efficient way.
+
+This mobile version was the **first prototype** before developing the full-stack web system.
+
+---
+
+## ✨ Features
 
 - Create and manage customer orders
-- Support for:
+- Support for multiple order types:
   - Delivery
   - Pickup
   - Local orders
 - Arabic language support
 - Order preview with item summaries
-- Clean and simple UI
-- Multi-platform support (Android, iOS, Web, Desktop)
+- Simple and clean UI
+- Multi-platform support:
+  - Android
+  - iOS
+  - Web
+  - Desktop
 
 ---
 
@@ -36,19 +42,40 @@ This system helps track orders, services (delivery, pickup, local), and customer
 
 - Flutter
 - Dart
-- Material UI
+- Material Design
 
 ---
-## 🎯 Why This Project Exists
 
-This application was built to digitize real-world order management in a butcher shop environment.
+## 🎯 Purpose
 
-It replaces manual order tracking and improves workflow efficiency inside the shop.
+This project was created to **digitize order management in a real butcher shop** and replace manual order tracking.
+
+It served as the **initial mobile prototype** before the development of the full-stack system.
+
+---
 
 ## 🚀 Getting Started
 
-1. Install Flutter SDK  
+1. Install the Flutter SDK  
 2. Clone the repository:
 
 ```bash
 git clone https://github.com/rayanib/butcher-order-manager.git
+```
+
+3. Run the project:
+
+```bash
+flutter pub get
+flutter run
+```
+
+---
+
+## 👨‍💻 Author
+
+**Rayan Ibrahem**  
+Computer Science Graduate – Full Stack Developer
+
+GitHub:  
+https://github.com/rayanib
